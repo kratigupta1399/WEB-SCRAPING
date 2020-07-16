@@ -1,0 +1,26 @@
+import os
+import bs4
+import requests
+import matplotlib.pyplot as plt
+url = "https://grras.com/page/gallery"                                                              #'http://www.aryacollege.in/wp-content/uploads/2018/12/arun-arya.jpg'                                                                                 #"https://www.aryacollege.in/page/image-gallery/"      https://www.aryacollege.in/arya-news-press/alumni-news/                          #"https://grras.com/page/gallery"                        #https://www.aryacollege.in/image-gallery/
+page = requests.get(url)
+html = page.content
+soup = bs4.BeautifulSoup(html, 'html.parser')
+imgs = soup.find_all('img')
+sources = []
+for img in imgs:
+    sources.append(img.attrs['src'])
+path = r'C:\Users\krati\Desktop\arya'
+for count, url in enumerate(sources):
+    if '?' in url:
+        i = url.find('?')
+        url = url[:i]
+    suffix = url.split('.')[-1]
+    page = requests.get(url)
+    if page.status_code == 200 and 'image' in page.headers['Content-type']:
+        fname = os.path.join(path, f"{count}.{suffix}")
+        fp = open(fname, 'wb')
+        fp.write(page.content)
+        fp.close()
+        plt.imshow(plt.imread(fname))
+        plt.show()
